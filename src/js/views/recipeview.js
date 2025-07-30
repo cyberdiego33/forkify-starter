@@ -1,5 +1,22 @@
 import icon from 'url:../../img/icons.svg';
 
+function decimalToFraction(decimal) {
+  const decimalStr = decimal.toString();
+  const decimalPlaces = decimalStr.split('.')[1]?.length || 0;
+
+  let numerator = decimal * Math.pow(10, decimalPlaces);
+  let denominator = Math.pow(10, decimalPlaces);
+
+  // Find GCD to simplify
+  const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+  const divisor = gcd(numerator, denominator);
+
+  numerator /= divisor;
+  denominator /= divisor;
+
+  return `${numerator}/${denominator}`;
+}
+
 const RecipeView = class {
   // Private Fields
   #parentElement = document.querySelector('.recipe');
@@ -90,7 +107,9 @@ const RecipeView = class {
                   <svg class="recipe__icon">
                     <use href="${icon}#icon-check"></use>
                   </svg>
-                  <div class="recipe__quantity">${ing.quantity}</div>
+                  <div class="recipe__quantity">${decimalToFraction(
+                    ing.quantity
+                  )}</div>
                   <div class="recipe__description">
                     <span class="recipe__unit">${ing.unit}</span>
                     ${ing.description}

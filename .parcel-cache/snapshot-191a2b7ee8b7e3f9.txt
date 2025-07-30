@@ -58,7 +58,7 @@
 71C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\img\favicon.png133783042770000000 0
 104C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\@parcel\transformer-babel\src\config.js133981882106295160 0
 120C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\internals\fix-regexp-well-known-symbol-logic.js133981965867865699 0
-56C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist133982623118139438 1
+56C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist133983273585041571 1
 68C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\img\logo.png133783042770000000 0
 93C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\features\map\some.js133981965949775745 0
 113C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\@swc\helpers\cjs\_class_apply_descriptor_get.cjs133981882105792672 0
@@ -247,7 +247,7 @@
 97C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\features\string\fixed.js133981965868032859 0
 111C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\features\array\virtual\reduce-right.js133981965932659463 0
 114C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\ordered-binary\.nyc_output\processinfo\index.json133981881955758131 0
-68C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\js\models.js133982563042924503 0
+68C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\js\models.js133982623861364205 0
 96C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\@parcel\core\src\Environment.js133981882165464697 0
 108C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\modules\esnext.map.get-or-insert.js133981965853425860 0
 91C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\utility-types\CHANGELOG.md133981881950806940 0
@@ -260,7 +260,7 @@
 104C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\full\typed-array\to-reversed.js133981965972595568 0
 113C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\LICENSE133981882053432992 0
 106C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\features\function\has-instance.js133981965882476003 0
-78C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\js\views\recipeview.js133982623200725110 0
+78C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\src\js\views\recipeview.js133983273599512074 0
 69C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\.bin133981884243757859 1
 99C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\stable\symbol\match-all.js133981965914665153 0
 83C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\readdirp\README.md133981884155423980 0
@@ -1840,7 +1840,7 @@
 96C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\es\typed-array\index.js133981965889436215 0
 77C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\lmdb\open.js133981882190419032 0
 96C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\core-js\full\instance\concat.js133981965810762103 0
-84C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.4a59a05f.js133982623118089444 0
+84C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.4a59a05f.js133983273584891574 0
 91C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\@parcel\core\lib\worker.js133981882206930255 0
 85C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\caniuse-lite\LICENSE133981881944788516 0
 116C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\mdb_drop.1133981882125949493 0
@@ -7474,7 +7474,7 @@
 96C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\.bin\update-browserslist-db.cmd133981882279385780 0
 96C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\node_modules\.bin\update-browserslist-db.ps1133981882279385780 0
 77C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\favicon.8b2f57bf.png133982621879094376 0
-88C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.4a59a05f.js.map133982623118139438 0
+88C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.4a59a05f.js.map133983273585041571 0
 88C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.62406edb.js.map133981946041816544 0
 89C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\forkify-starter.f7626f62.css.map133982621878663282 0
 75C:\Users\LENOVO-PC\Documents\GitHub\forkify-starter\dist\icons.21bad73c.svg133982621878462640 0
