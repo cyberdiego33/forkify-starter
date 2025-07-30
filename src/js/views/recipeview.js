@@ -1,26 +1,35 @@
 import icon from 'url:../../img/icons.svg';
 
 function decimalToFraction(decimal) {
-  const decimalStr = decimal.toString();
-  const decimalPlaces = decimalStr.split('.')[1]?.length || 0;
+  if (decimal == null || decimal === '') return '';
+  if (Number.isInteger(decimal)) return decimal;
 
-  let numerator = decimal * Math.pow(10, decimalPlaces);
-  let denominator = Math.pow(10, decimalPlaces);
+  const tolerance = 1.0e-6;
+  let h1 = 1,
+    h2 = 0,
+    k1 = 0,
+    k2 = 1,
+    b = decimal;
+  do {
+    let a = Math.floor(b);
+    let aux = h1;
+    h1 = a * h1 + h2;
+    h2 = aux;
+    aux = k1;
+    k1 = a * k1 + k2;
+    k2 = aux;
+    b = 1 / (b - a);
+  } while (Math.abs(decimal - h1 / k1) > decimal * tolerance);
 
-  // Find GCD to simplify
-  const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
-  const divisor = gcd(numerator, denominator);
-
-  numerator /= divisor;
-  denominator /= divisor;
-
-  return `${numerator}/${denominator}`;
+  return `${h1}/${k1}`;
 }
 
 const RecipeView = class {
   // Private Fields
   #parentElement = document.querySelector('.recipe');
   #data;
+  #errorMessage = 'We could not find that recipe. Please try another one';
+  #message;
 
   // No constructor
 
@@ -36,8 +45,56 @@ const RecipeView = class {
     this.#parentElement.insertAdjacentHTML('afterbegin', stringRecipe); // adding the recipe stringdiv
   }
 
+  addhandlerEvent(callback) {
+    ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, callback));
+  }
+
   #clearParentEl() {
     this.#parentElement.innerHTML = ''; // Removing the existing message
+  }
+
+  //////////////////////////////////////////
+  // A spinner function
+  spinner() {
+    const stringSpinner = `
+      <div class="spinner">
+            <svg>
+              <use href="${icon}#icon-loader"></use>
+            </svg>
+          </div>
+    `;
+    this.#clearParentEl();
+    this.#parentElement.insertAdjacentHTML('afterbegin', stringSpinner);
+  }
+
+  RenderErrorMes(message = this.#errorMessage) {
+    const markup = `
+          <div class="message">
+            <div>
+              <svg>
+                <use href="src/img/icons.svg#icon-alert-triangle"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div>`;
+
+    this.#clearParentEl();
+    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+  }
+
+  showSuccess(message = this.#message) {
+    const markup = `
+          <div class="error">
+            <div>
+              <svg>
+                <use href="src/img/icons.svg#icon-smile"></use>
+              </svg>
+            </div>
+            <p>${message}</p>
+          </div>`;
+
+    this.#clearParentEl();
+    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
   #generateHTml() {
@@ -111,7 +168,9 @@ const RecipeView = class {
                     ing.quantity
                   )}</div>
                   <div class="recipe__description">
-                    <span class="recipe__unit">${ing.unit}</span>
+                    <span class="recipe__unit">${
+                      ing.unit ? ing.unit : ''
+                    }</span>
                     ${ing.description}
                   </div>
                 </li>
