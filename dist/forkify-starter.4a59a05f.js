@@ -712,10 +712,9 @@ const controlLoadSearch = async function() {
         // Getting the query from search input
         const query = (0, _searchviewJsDefault.default).getQuery(); // The search input is returned from searchView method
         if (!query) return;
-        const response = await _modelsJs.LoadSearchResults(query);
-        // if (!response) throw new Error(`your search is ${response}`);
-        // console.log(model.modelState.searchs.results[0]);
-        (0, _resultsviewJsDefault.default).render(_modelsJs.modelState.searchs.results);
+        await _modelsJs.LoadSearchResults(query);
+        // console.log(model.getSearchResultPage(1));
+        (0, _resultsviewJsDefault.default).render(_modelsJs.getSearchResultPage());
     } catch (error) {
         console.log(`Error from load results ${error}`);
     }
@@ -724,10 +723,8 @@ const controlLoadSearch = async function() {
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
-    console.log('started');
     (0, _recipeviewJsDefault.default).addhandlerEvent(showRecipe);
     (0, _searchviewJsDefault.default).addSearchListener(controlLoadSearch);
-    console.log('ended');
 };
 init();
 
@@ -2605,13 +2602,16 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "modelState", ()=>modelState);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "LoadSearchResults", ()=>LoadSearchResults);
+parcelHelpers.export(exports, "getSearchResultPage", ()=>getSearchResultPage);
 var _configJs = require("./config.js");
 var _helpersJs = require("./helpers.js");
 const modelState = {
     recipe: {},
     searchs: {
         query: '',
-        results: []
+        page: 1,
+        results: [],
+        resultPerPage: (0, _configJs.RES_PER_PAGE)
     }
 };
 const loadRecipe = async function(id) {
@@ -2653,6 +2653,12 @@ const LoadSearchResults = async function(query) {
         throw error;
     }
 };
+const getSearchResultPage = function(page = modelState.searchs.page) {
+    modelState.searchs.page = page;
+    const start = (page - 1) * modelState.searchs.resultPerPage;
+    const end = page * modelState.searchs.resultPerPage;
+    return modelState.searchs.results.slice(start, end);
+};
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./config.js":"2hPh4","./helpers.js":"7nL9P"}],"2hPh4":[function(require,module,exports,__globalThis) {
 // export const API_URL = 'https://forkify-api.jonas.io/api/v2/recipes'
@@ -2661,8 +2667,10 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "API_URL", ()=>API_URL);
 parcelHelpers.export(exports, "TIMEOUT_SEC", ()=>TIMEOUT_SEC);
+parcelHelpers.export(exports, "RES_PER_PAGE", ()=>RES_PER_PAGE);
 const API_URL = 'https://forkify-api.herokuapp.com/api/v2/recipes';
 const TIMEOUT_SEC = 10;
+const RES_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"7nL9P":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -2925,7 +2933,7 @@ const ResultsView = class extends (0, _viewsDefault.default) {
     _errorMessage = 'No recipes found for your query! please try again :)';
     message;
     _generateHTml() {
-        console.log(this._data);
+        // console.log(this._data);
         return this._data.map((data)=>this._MarkupPreview(data)).join('');
     }
     _MarkupPreview(result) {

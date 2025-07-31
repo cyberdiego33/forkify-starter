@@ -6,7 +6,7 @@ const ResultsView = class extends Views {
   _errorMessage = 'No recipes found for your query! please try again :)';
   message;
   _generateHTml() {
-    console.log(this._data);
+    // console.log(this._data);
 
     return this._data.map(data => this._MarkupPreview(data)).join('');
   }

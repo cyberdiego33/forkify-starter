@@ -49,11 +49,10 @@ const controlLoadSearch = async function () {
     const query = SearchView.getQuery(); // The search input is returned from searchView method
     if (!query) return;
 
-    const response = await model.LoadSearchResults(query);
-    // if (!response) throw new Error(`your search is ${response}`);
+    await model.LoadSearchResults(query);
 
-    // console.log(model.modelState.searchs.results[0]);
-    resultsview.render(model.modelState.searchs.results);
+    // console.log(model.getSearchResultPage(1));
+    resultsview.render(model.getSearchResultPage());
   } catch (error) {
     console.log(`Error from load results ${error}`);
   }
@@ -65,10 +64,8 @@ const controlLoadSearch = async function () {
 // Initializing the app
 
 const init = function () {
-  console.log('started');
   recipeview.addhandlerEvent(showRecipe);
   SearchView.addSearchListener(controlLoadSearch);
-  console.log('ended');
 };
 
 init();

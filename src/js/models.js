@@ -1,11 +1,13 @@
-import { API_URL } from './config.js';
+import { API_URL, RES_PER_PAGE } from './config.js';
 import { getJson } from './helpers.js';
 
 export const modelState = {
   recipe: {},
   searchs: {
     query: '',
+    page: 1,
     results: [],
+    resultPerPage: RES_PER_PAGE,
   },
 };
 
@@ -52,4 +54,13 @@ export const LoadSearchResults = async function (query) {
   } catch (error) {
     throw error;
   }
+};
+
+export const getSearchResultPage = function (page = modelState.searchs.page) {
+  modelState.searchs.page = page;
+
+  const start = (page - 1) * modelState.searchs.resultPerPage;
+  const end = page * modelState.searchs.resultPerPage;
+
+  return modelState.searchs.results.slice(start, end);
 };
