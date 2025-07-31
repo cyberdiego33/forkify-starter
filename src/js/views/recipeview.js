@@ -37,36 +37,6 @@ const RecipeView = class extends Views {
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, callback));
   }
 
-  RenderErrorMes(message = this._errorMessage) {
-    const markup = `
-          <div class="message">
-            <div>
-              <svg>
-                <use href="src/img/icons.svg#icon-alert-triangle"></use>
-              </svg>
-            </div>
-            <p>${message}</p>
-          </div>`;
-
-    this._clearParentEl();
-    this._parentElement.insertAdjacentHTML('afterbegin', markup);
-  }
-
-  showSuccess(message = this.message) {
-    const markup = `
-          <div class="error">
-            <div>
-              <svg>
-                <use href="src/img/icons.svg#icon-smile"></use>
-              </svg>
-            </div>
-            <p>${message}</p>
-          </div>`;
-
-    this._clearParentEl();
-    this._parentElement.insertAdjacentHTML('afterbegin', markup);
-  }
-
   _generateHTml() {
     return `
 

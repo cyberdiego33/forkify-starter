@@ -4,6 +4,9 @@ export default class Views {
   _data;
 
   render(data) {
+    if (!data || (Array.isArray(data) && data.length === 0))
+      return this.RenderErrorMes();
+
     this._data = data;
 
     // Get stringHTML
@@ -31,5 +34,35 @@ export default class Views {
     `;
     this._clearParentEl();
     this._parentElement.insertAdjacentHTML('afterbegin', stringSpinner);
+  }
+
+  RenderErrorMes(message = this._errorMessage) {
+    const markup = `
+            <div class="message">
+              <div>
+                <svg>
+                  <use href="${icon}#icon-alert-triangle"></use>
+                </svg>
+              </div>
+              <p>${message}</p>
+            </div>`;
+
+    this._clearParentEl();
+    this._parentElement.insertAdjacentHTML('afterbegin', markup);
+  }
+
+  showSuccess(message = this.message) {
+    const markup = `
+            <div class="error">
+              <div>
+                <svg>
+                  <use href="src/img/icons.svg#icon-smile"></use>
+                </svg>
+              </div>
+              <p>${message}</p>
+            </div>`;
+
+    this._clearParentEl();
+    this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 }

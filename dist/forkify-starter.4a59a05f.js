@@ -679,6 +679,8 @@ var _recipeviewJs = require("./views/recipeview.js");
 var _recipeviewJsDefault = parcelHelpers.interopDefault(_recipeviewJs);
 var _searchviewJs = require("./views/searchview.js");
 var _searchviewJsDefault = parcelHelpers.interopDefault(_searchviewJs);
+var _resultsviewJs = require("./views/resultsview.js");
+var _resultsviewJsDefault = parcelHelpers.interopDefault(_resultsviewJs);
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
 ///////////////////////////////////////
@@ -706,17 +708,19 @@ const showRecipe = async function() {
 // Handling the search results events
 const controlLoadSearch = async function() {
     try {
+        (0, _resultsviewJsDefault.default).spinner();
         // Getting the query from search input
         const query = (0, _searchviewJsDefault.default).getQuery(); // The search input is returned from searchView method
         if (!query) return;
         const response = await _modelsJs.LoadSearchResults(query);
         // if (!response) throw new Error(`your search is ${response}`);
-        console.log(_modelsJs.modelState.searchs.results[0]);
+        // console.log(model.modelState.searchs.results[0]);
+        (0, _resultsviewJsDefault.default).render(_modelsJs.modelState.searchs.results);
     } catch (error) {
         console.log(`Error from load results ${error}`);
     }
 };
-controlLoadSearch('pizza');
+// controlLoadSearch('pizza');
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
@@ -727,7 +731,7 @@ const init = function() {
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","url:../img/icons.svg":"fd0vu","./views/searchview.js":"3up1j"}],"jnFvT":[function(require,module,exports,__globalThis) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","url:../img/icons.svg":"fd0vu","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2723,32 +2727,6 @@ const RecipeView = class extends (0, _viewsDefault.default) {
             'load'
         ].forEach((ev)=>window.addEventListener(ev, callback));
     }
-    RenderErrorMes(message = this._errorMessage) {
-        const markup = `
-          <div class="message">
-            <div>
-              <svg>
-                <use href="src/img/icons.svg#icon-alert-triangle"></use>
-              </svg>
-            </div>
-            <p>${message}</p>
-          </div>`;
-        this._clearParentEl();
-        this._parentElement.insertAdjacentHTML('afterbegin', markup);
-    }
-    showSuccess(message = this.message) {
-        const markup = `
-          <div class="error">
-            <div>
-              <svg>
-                <use href="src/img/icons.svg#icon-smile"></use>
-              </svg>
-            </div>
-            <p>${message}</p>
-          </div>`;
-        this._clearParentEl();
-        this._parentElement.insertAdjacentHTML('afterbegin', markup);
-    }
     _generateHTml() {
         return `
 
@@ -2857,6 +2835,7 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class Views {
     _data;
     render(data) {
+        if (!data || Array.isArray(data) && data.length === 0) return this.RenderErrorMes();
         this._data = data;
         // Get stringHTML
         const stringRecipe = this._generateHTml();
@@ -2880,6 +2859,32 @@ class Views {
     `;
         this._clearParentEl();
         this._parentElement.insertAdjacentHTML('afterbegin', stringSpinner);
+    }
+    RenderErrorMes(message = this._errorMessage) {
+        const markup = `
+            <div class="message">
+              <div>
+                <svg>
+                  <use href="${(0, _iconsSvgDefault.default)}#icon-alert-triangle"></use>
+                </svg>
+              </div>
+              <p>${message}</p>
+            </div>`;
+        this._clearParentEl();
+        this._parentElement.insertAdjacentHTML('afterbegin', markup);
+    }
+    showSuccess(message = this.message) {
+        const markup = `
+            <div class="error">
+              <div>
+                <svg>
+                  <use href="src/img/icons.svg#icon-smile"></use>
+                </svg>
+              </div>
+              <p>${message}</p>
+            </div>`;
+        this._clearParentEl();
+        this._parentElement.insertAdjacentHTML('afterbegin', markup);
     }
 }
 exports.default = Views;
@@ -2908,6 +2913,44 @@ const SearchView = class {
 };
 exports.default = new SearchView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["5DuvQ","7dWZ8"], "7dWZ8", "parcelRequired893", {}, "./", "/")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"hncNs":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _iconsSvg = require("url:../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _views = require("./views");
+var _viewsDefault = parcelHelpers.interopDefault(_views);
+const ResultsView = class extends (0, _viewsDefault.default) {
+    _parentElement = document.querySelector('.results');
+    _errorMessage = 'No recipes found for your query! please try again :)';
+    message;
+    _generateHTml() {
+        console.log(this._data);
+        return this._data.map((data)=>this._MarkupPreview(data)).join('');
+    }
+    _MarkupPreview(result) {
+        return `
+        <li class="preview">
+            <a class="preview__link preview__link--active" href="#${result.id}">
+              <figure class="preview__fig">
+                <img src="${result.imageUrl}" alt="Test" />
+              </figure>
+              <div class="preview__data">
+                <h4 class="preview__title">${result.title}</h4>
+                <p class="preview__publisher">${result.publisher}</p>
+                <div class="preview__user-generated">
+                  <svg>
+                    <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </li>
+    `;
+    }
+};
+exports.default = new ResultsView();
+
+},{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["5DuvQ","7dWZ8"], "7dWZ8", "parcelRequired893", {}, "./", "/")
 
 //# sourceMappingURL=forkify-starter.4a59a05f.js.map
