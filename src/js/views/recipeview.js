@@ -1,4 +1,5 @@
 import icon from 'url:../../img/icons.svg';
+import Views from './views';
 
 function decimalToFraction(decimal) {
   if (decimal == null || decimal === '') return '';
@@ -24,50 +25,19 @@ function decimalToFraction(decimal) {
   return `${h1}/${k1}`;
 }
 
-const RecipeView = class {
+const RecipeView = class extends Views {
   // Private Fields
-  #parentElement = document.querySelector('.recipe');
-  #data;
-  #errorMessage = 'We could not find that recipe. Please try another one';
-  #message;
+  _parentElement = document.querySelector('.recipe');
+  _errorMessage = 'We could not find that recipe. Please try another one';
+  message;
 
   // No constructor
-
-  render(data) {
-    this.#data = data;
-
-    // Get stringHTML
-    const stringRecipe = this.#generateHTml();
-
-    /////////////////////////////////////////////
-    // Inserting the stringRecipe
-    this.#clearParentEl();
-    this.#parentElement.insertAdjacentHTML('afterbegin', stringRecipe); // adding the recipe stringdiv
-  }
 
   addhandlerEvent(callback) {
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, callback));
   }
 
-  #clearParentEl() {
-    this.#parentElement.innerHTML = ''; // Removing the existing message
-  }
-
-  //////////////////////////////////////////
-  // A spinner function
-  spinner() {
-    const stringSpinner = `
-      <div class="spinner">
-            <svg>
-              <use href="${icon}#icon-loader"></use>
-            </svg>
-          </div>
-    `;
-    this.#clearParentEl();
-    this.#parentElement.insertAdjacentHTML('afterbegin', stringSpinner);
-  }
-
-  RenderErrorMes(message = this.#errorMessage) {
+  RenderErrorMes(message = this._errorMessage) {
     const markup = `
           <div class="message">
             <div>
@@ -78,11 +48,11 @@ const RecipeView = class {
             <p>${message}</p>
           </div>`;
 
-    this.#clearParentEl();
-    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    this._clearParentEl();
+    this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
-  showSuccess(message = this.#message) {
+  showSuccess(message = this.message) {
     const markup = `
           <div class="error">
             <div>
@@ -93,17 +63,17 @@ const RecipeView = class {
             <p>${message}</p>
           </div>`;
 
-    this.#clearParentEl();
-    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+    this._clearParentEl();
+    this._parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
-  #generateHTml() {
+  _generateHTml() {
     return `
 
         <figure class="recipe__fig">
-          <img src="${this.#data.imageUrl}" alt="Tomato" class="recipe__img" />
+          <img src="${this._data.imageUrl}" alt="Tomato" class="recipe__img" />
           <h1 class="recipe__title">
-            <span>${this.#data.title}</span>
+            <span>${this._data.title}</span>
           </h1>
         </figure>
 
@@ -113,7 +83,7 @@ const RecipeView = class {
               <use href="${icon}#icon-clock"></use>
             </svg>
             <span class="recipe__info-data recipe__info-data--minutes">${
-              this.#data.cookingTime
+              this._data.cookingTime
             }</span>
             <span class="recipe__info-text">minutes</span>
           </div>
@@ -122,7 +92,7 @@ const RecipeView = class {
               <use href="${icon}#icon-users"></use>
             </svg>
             <span class="recipe__info-data recipe__info-data--people">${
-              this.#data.servings
+              this._data.servings
             }</span>
             <span class="recipe__info-text">servings</span>
 
@@ -157,7 +127,7 @@ const RecipeView = class {
           <ul class="recipe__ingredient-list">
 
 
-            ${this.#data.ingredients
+            ${this._data.ingredients
               .map(ing => {
                 return `
                 <li class="recipe__ingredient">
@@ -186,13 +156,13 @@ const RecipeView = class {
           <p class="recipe__directions-text">
             This recipe was carefully designed and tested by
             <span class="recipe__publisher">${
-              this.#data.publisher
+              this._data.publisher
             }</span>. Please check out
             directions at their website.
           </p>
           <a
             class="btn--small recipe__btn"
-            href="${this.#data.sourceUrl}"
+            href="${this._data.sourceUrl}"
             target="_blank"
           >
             <span>Directions</span>
