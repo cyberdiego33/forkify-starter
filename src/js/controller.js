@@ -8,6 +8,7 @@ import * as model from './models.js';
 import recipeview from './views/recipeview.js';
 import SearchView from './views/searchview.js';
 import resultsview from './views/resultsview.js';
+import paginationview from './views/paginationview.js';
 
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
@@ -49,10 +50,16 @@ const controlLoadSearch = async function () {
     const query = SearchView.getQuery(); // The search input is returned from searchView method
     if (!query) return;
 
+    // Load the search results
     await model.LoadSearchResults(query);
 
     // console.log(model.getSearchResultPage(1));
-    resultsview.render(model.getSearchResultPage());
+    resultsview.render(
+      model.getSearchResultPage(model.modelState.searchs.page)
+    );
+
+    // Render initial pagination buttons
+    paginationview.render(model.modelState.searchs);
   } catch (error) {
     console.log(`Error from load results ${error}`);
   }
