@@ -1,6 +1,5 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
-import icon from 'url:../img/icons.svg';
 
 /////////////////////////////////////
 // import { loadRecipe, modelState } from './models.js';
@@ -53,10 +52,8 @@ const controlLoadSearch = async function () {
     // Load the search results
     await model.LoadSearchResults(query);
 
-    // console.log(model.getSearchResultPage(1));
-    resultsview.render(
-      model.getSearchResultPage(model.modelState.searchs.page)
-    );
+    // Render Initial or First page
+    resultsview.render(model.getSearchResultPage(1));
 
     // Render initial pagination buttons
     paginationview.render(model.modelState.searchs);
@@ -65,7 +62,14 @@ const controlLoadSearch = async function () {
   }
 };
 
-// controlLoadSearch('pizza');
+const controlPagination = function (goto) {
+  console.log('Pagination clicked', goto);
+  // Render New or Current page
+  resultsview.render(model.getSearchResultPage(goto));
+
+  // Render New pagination buttons
+  paginationview.render(model.modelState.searchs);
+};
 
 //////////////////////////////////////////
 // Initializing the app
@@ -73,6 +77,7 @@ const controlLoadSearch = async function () {
 const init = function () {
   recipeview.addhandlerEvent(showRecipe);
   SearchView.addSearchListener(controlLoadSearch);
+  paginationview.addPageHandler(controlPagination);
 };
 
 init();

@@ -6,20 +6,22 @@ const PaginationView = class extends Views {
   _errorMessage = 'No recipes found for your query! please try again :)';
   message;
 
+  addPageHandler(callback) {
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--inline');
+      if (!btn) return;
+
+      // Getting the clicked page number from dataset
+      const goto = +btn.dataset.goto;
+      callback(goto);
+    });
+  }
+
   // Get html for the pagination buttons
   _generateHTml() {
     const numPages = Math.ceil(
       this._data.results.length / this._data.resultPerPage
     );
-
-    const data = {
-      query: this._data.query,
-      page: this._data.page,
-      results: this._data.results,
-      resultPerPage: this._data.resultPerPage,
-      numPages,
-    };
-    console.log(data);
 
     //////////////////////////////////////////////////////////
     // My Logic
@@ -34,29 +36,32 @@ const PaginationView = class extends Views {
 
     // page 1 and next
     if (one && presentPage < numPages) {
-      this._data.page += 1;
       return `
-          <button class="btn--inline pagination__btn--next">
+          <button data-goto="${
+            presentPage + 1
+          }" class="btn--inline pagination__btn--next">
             <span>Page ${presentPage + 1}</span>
             <svg class="search__icon">
               <use href="${icon}#icon-arrow-right"></use>
             </svg>
           </button>
       `;
-      // return `page 1 and more`
     }
 
     // page previous and next
     if (!one && presentPage < numPages) {
-      this._data.page += 1;
       return `
-        <button class="btn--inline pagination__btn--prev">
+        <button data-goto="${
+          presentPage - 1
+        }" class="btn--inline pagination__btn--prev">
             <svg class="search__icon">
               <use href="${icon}#icon-arrow-left"></use>
             </svg>
             <span>Page ${presentPage - 1}</span>
           </button>
-          <button class="btn--inline pagination__btn--next">
+          <button data-goto="${
+            presentPage + 1
+          }" class="btn--inline pagination__btn--next">
             <span>Page ${presentPage + 1}</span>
             <svg class="search__icon">
               <use href="${icon}#icon-arrow-right"></use>
@@ -67,9 +72,10 @@ const PaginationView = class extends Views {
 
     // last page and previous
     if (!one && presentPage === numPages) {
-      this._data.page -= 1;
       return `
-          <button class="btn--inline pagination__btn--prev">
+          <button data-goto="${
+            presentPage - 1
+          }" class="btn--inline pagination__btn--prev">
             <svg class="search__icon">
               <use href="${icon}#icon-arrow-left"></use>
             </svg>

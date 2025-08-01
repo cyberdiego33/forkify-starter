@@ -670,8 +670,6 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _runtime = require("regenerator-runtime/runtime");
-var _iconsSvg = require("url:../img/icons.svg");
-var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 /////////////////////////////////////
 // import { loadRecipe, modelState } from './models.js';
 var _modelsJs = require("./models.js");
@@ -716,24 +714,31 @@ const controlLoadSearch = async function() {
         if (!query) return;
         // Load the search results
         await _modelsJs.LoadSearchResults(query);
-        // console.log(model.getSearchResultPage(1));
-        (0, _resultsviewJsDefault.default).render(_modelsJs.getSearchResultPage(_modelsJs.modelState.searchs.page));
+        // Render Initial or First page
+        (0, _resultsviewJsDefault.default).render(_modelsJs.getSearchResultPage(1));
         // Render initial pagination buttons
         (0, _paginationviewJsDefault.default).render(_modelsJs.modelState.searchs);
     } catch (error) {
         console.log(`Error from load results ${error}`);
     }
 };
-// controlLoadSearch('pizza');
+const controlPagination = function(goto) {
+    console.log('Pagination clicked', goto);
+    // Render New or Current page
+    (0, _resultsviewJsDefault.default).render(_modelsJs.getSearchResultPage(goto));
+    // Render New pagination buttons
+    (0, _paginationviewJsDefault.default).render(_modelsJs.modelState.searchs);
+};
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
     (0, _recipeviewJsDefault.default).addhandlerEvent(showRecipe);
     (0, _searchviewJsDefault.default).addSearchListener(controlLoadSearch);
+    (0, _paginationviewJsDefault.default).addPageHandler(controlPagination);
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","url:../img/icons.svg":"fd0vu","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/paginationview.js":"eayKT"}],"jnFvT":[function(require,module,exports,__globalThis) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/paginationview.js":"eayKT"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2975,17 +2980,18 @@ const PaginationView = class extends (0, _viewsDefault.default) {
     _parentElement = document.querySelector('.pagination');
     _errorMessage = 'No recipes found for your query! please try again :)';
     message;
+    addPageHandler(callback) {
+        this._parentElement.addEventListener('click', (e)=>{
+            const btn = e.target.closest('.btn--inline');
+            if (!btn) return;
+            // Getting the clicked page number from dataset
+            const goto = +btn.dataset.goto;
+            callback(goto);
+        });
+    }
     // Get html for the pagination buttons
     _generateHTml() {
         const numPages = Math.ceil(this._data.results.length / this._data.resultPerPage);
-        const data = {
-            query: this._data.query,
-            page: this._data.page,
-            results: this._data.results,
-            resultPerPage: this._data.resultPerPage,
-            numPages
-        };
-        console.log(data);
         //////////////////////////////////////////////////////////
         // My Logic
         const presentPage = this._data.page;
@@ -2993,48 +2999,38 @@ const PaginationView = class extends (0, _viewsDefault.default) {
         // page 1 only
         if (one && presentPage === numPages) return `page 1 only`;
         // page 1 and next
-        if (one && presentPage < numPages) {
-            this._data.page += 1;
-            return `
-          <button class="btn--inline pagination__btn--next">
+        if (one && presentPage < numPages) return `
+          <button data-goto="${presentPage + 1}" class="btn--inline pagination__btn--next">
             <span>Page ${presentPage + 1}</span>
             <svg class="search__icon">
               <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
             </svg>
           </button>
       `;
-        // return `page 1 and more`
-        }
         // page previous and next
-        if (!one && presentPage < numPages) {
-            this._data.page += 1;
-            return `
-        <button class="btn--inline pagination__btn--prev">
+        if (!one && presentPage < numPages) return `
+        <button data-goto="${presentPage - 1}" class="btn--inline pagination__btn--prev">
             <svg class="search__icon">
               <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
             </svg>
             <span>Page ${presentPage - 1}</span>
           </button>
-          <button class="btn--inline pagination__btn--next">
+          <button data-goto="${presentPage + 1}" class="btn--inline pagination__btn--next">
             <span>Page ${presentPage + 1}</span>
             <svg class="search__icon">
               <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
             </svg>
           </button>
       `;
-        }
         // last page and previous
-        if (!one && presentPage === numPages) {
-            this._data.page -= 1;
-            return `
-          <button class="btn--inline pagination__btn--prev">
+        if (!one && presentPage === numPages) return `
+          <button data-goto="${presentPage - 1}" class="btn--inline pagination__btn--prev">
             <svg class="search__icon">
               <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
             </svg>
             <span>Page ${presentPage - 1}</span>
           </button>
       `;
-        }
     }
 };
 exports.default = new PaginationView();
