@@ -81,7 +81,8 @@ const handleServings = function (newServings) {
   // Update the recipeView ingredients
   const RecipeObj = model.modelState.recipe;
 
-  recipeview.render(RecipeObj);
+  // recipeview.render(RecipeObj);
+  recipeview.updateMarkup(RecipeObj);
 };
 
 //////////////////////////////////////////

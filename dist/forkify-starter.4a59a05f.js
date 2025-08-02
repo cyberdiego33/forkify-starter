@@ -2888,6 +2888,13 @@ class Views {
         this._clearParentEl();
         this._parentElement.insertAdjacentHTML('afterbegin', stringRecipe); // adding the recipe stringdiv
     }
+    // For new changes
+    updateMarkup(data) {
+        if (!data || Array.isArray(data) && data.length === 0) return this.RenderErrorMes();
+        this._data = data;
+        // Get New stringHTML
+        const stringRecipe = this._generateHTml();
+    }
     _clearParentEl() {
         this._parentElement.innerHTML = ''; // Removing the existing message
     }
