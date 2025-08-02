@@ -37,6 +37,16 @@ const RecipeView = class extends Views {
     ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, callback));
   }
 
+  updateServing(handler) {
+    this._parentElement.addEventListener('click', e => {
+      const btn = e.target.closest('.btn--update-servings');
+      if (!btn) return;
+
+      const { updateto } = btn.dataset;
+      if (+updateto > 0) handler(+updateto);
+    });
+  }
+
   _generateHTml() {
     return `
 
@@ -67,12 +77,16 @@ const RecipeView = class extends Views {
             <span class="recipe__info-text">servings</span>
 
             <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-updateto="${
+                this._data.servings - 1
+              }">
                 <svg>
                   <use href="${icon}#icon-minus-circle"></use>
                 </svg>
               </button>
-              <button class="btn--tiny btn--increase-servings">
+              <button class="btn--tiny btn--update-servings" data-updateto="${
+                this._data.servings + 1
+              }">
                 <svg>
                   <use href="${icon}#icon-plus-circle"></use>
                 </svg>

@@ -72,12 +72,26 @@ const controlPagination = function (goto) {
 };
 
 //////////////////////////////////////////
+// Updating servings
+
+const handleServings = function (newServings) {
+  // Update the ModelState data
+  model.loadServings(newServings);
+
+  // Update the recipeView ingredients
+  const RecipeObj = model.modelState.recipe;
+
+  recipeview.render(RecipeObj);
+};
+
+//////////////////////////////////////////
 // Initializing the app
 
 const init = function () {
   recipeview.addhandlerEvent(showRecipe);
   SearchView.addSearchListener(controlLoadSearch);
   paginationview.addPageHandler(controlPagination);
+  recipeview.updateServing(handleServings);
 };
 
 init();
