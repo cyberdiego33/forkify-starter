@@ -20,8 +20,8 @@ export default class Views {
 
   // For new changes
   updateMarkup(data) {
-    if (!data || (Array.isArray(data) && data.length === 0))
-      return this.RenderErrorMes();
+    // if (!data || (Array.isArray(data) && data.length === 0))
+    //   return this.RenderErrorMes();
 
     this._data = data;
 
