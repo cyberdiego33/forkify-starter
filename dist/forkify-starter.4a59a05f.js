@@ -683,6 +683,10 @@ var _paginationviewJs = require("./views/paginationview.js");
 var _paginationviewJsDefault = parcelHelpers.interopDefault(_paginationviewJs);
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
+//////////////////////////////////////
+const GetRecipeObj = function() {
+    return _modelsJs.modelState.recipe;
+};
 ///////////////////////////////////////
 // Fetching first recipe
 const showRecipe = async function() {
@@ -695,10 +699,11 @@ const showRecipe = async function() {
         // Load recipe
         await _modelsJs.loadRecipe(hashId);
         // Getting the recipe from modelState
-        const RecipeObj = _modelsJs.modelState.recipe;
+        const RecipeObj = GetRecipeObj();
         // console.log(RecipeObj);
         // Rendering the recipe
         (0, _recipeviewJsDefault.default).render(RecipeObj);
+        (0, _resultsviewJsDefault.default).updateMarkup(_modelsJs.getSearchResultPage());
     } catch (error) {
         console.error(`You have ${error}`);
         (0, _recipeviewJsDefault.default).RenderErrorMes();
@@ -736,15 +741,16 @@ const handleServings = function(newServings) {
     _modelsJs.loadServings(newServings);
     // Update the recipeView ingredients
     const RecipeObj = _modelsJs.modelState.recipe;
-    (0, _recipeviewJsDefault.default).render(RecipeObj);
+    // recipeview.render(RecipeObj);
+    (0, _recipeviewJsDefault.default).updateMarkup(RecipeObj);
 };
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
     (0, _recipeviewJsDefault.default).addhandlerEvent(showRecipe);
+    (0, _recipeviewJsDefault.default).updateServing(handleServings);
     (0, _searchviewJsDefault.default).addSearchListener(controlLoadSearch);
     (0, _paginationviewJsDefault.default).addPageHandler(controlPagination);
-    (0, _recipeviewJsDefault.default).updateServing(handleServings);
 };
 init();
 
@@ -2767,8 +2773,10 @@ const RecipeView = class extends (0, _viewsDefault.default) {
         this._parentElement.addEventListener('click', (e)=>{
             const btn = e.target.closest('.btn--update-servings');
             if (!btn) return;
-            const { updateto } = btn.dataset;
-            if (+updateto > 0) handler(+updateto);
+            // console.log('Servings clicked');
+            const updateto = +btn.dataset.updateto;
+            // console.log('update to', updateto);
+            if (updateto > 0) handler(updateto);
         });
     }
     _generateHTml() {
@@ -2893,7 +2901,15 @@ class Views {
         if (!data || Array.isArray(data) && data.length === 0) return this.RenderErrorMes();
         this._data = data;
         // Get New stringHTML
-        const stringRecipe = this._generateHTml();
+        const NewStringRecipe = this._generateHTml();
+        const newDom = document.createRange().createContextualFragment(NewStringRecipe); // Coverting string to DOM elememts
+        const newDomElements = Array.from(newDom.querySelectorAll('*'));
+        const curElements = Array.from(this._parentElement.querySelectorAll('*')); // Getting them as an array
+        newDomElements.forEach((newEl, index)=>{
+            const curEl = curElements[index];
+            if (!newEl.isEqualNode(curEl) && newEl.firstChild.nodeValue.trim() !== '') curEl.textContent = newEl.textContent;
+            if (!newEl.isEqualNode(curEl)) Array.from(newEl.attributes).forEach((attr)=>curEl.setAttribute(attr.name, attr.value));
+        });
     }
     _clearParentEl() {
         this._parentElement.innerHTML = ''; // Removing the existing message
@@ -2980,9 +2996,10 @@ const ResultsView = class extends (0, _viewsDefault.default) {
         return this._data.map((data)=>this._MarkupPreview(data)).join('');
     }
     _MarkupPreview(result) {
+        const hashId = window.location.hash.slice(1);
         return `
         <li class="preview">
-            <a class="preview__link preview__link--active" href="#${result.id}">
+            <a class="preview__link ${hashId === result.id ? 'preview__link--active' : ''}" href="#${result.id}">
               <figure class="preview__fig">
                 <img src="${result.imageUrl}" alt="Test" />
               </figure>

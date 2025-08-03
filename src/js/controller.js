@@ -12,6 +12,11 @@ import paginationview from './views/paginationview.js';
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
 
+//////////////////////////////////////
+const GetRecipeObj = function () {
+  return model.modelState.recipe;
+};
+
 ///////////////////////////////////////
 // Fetching first recipe
 const showRecipe = async function () {
@@ -28,11 +33,13 @@ const showRecipe = async function () {
     await model.loadRecipe(hashId);
 
     // Getting the recipe from modelState
-    const RecipeObj = model.modelState.recipe;
+    const RecipeObj = GetRecipeObj();
     // console.log(RecipeObj);
 
     // Rendering the recipe
     recipeview.render(RecipeObj);
+
+    resultsview.updateMarkup(model.getSearchResultPage());
   } catch (error) {
     console.error(`You have ${error}`);
     recipeview.RenderErrorMes();
@@ -90,11 +97,9 @@ const handleServings = function (newServings) {
 
 const init = function () {
   recipeview.addhandlerEvent(showRecipe);
+  recipeview.updateServing(handleServings);
   SearchView.addSearchListener(controlLoadSearch);
   paginationview.addPageHandler(controlPagination);
-  recipeview.updateServing(handleServings);
 };
 
 init();
-
-// New message

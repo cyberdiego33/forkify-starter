@@ -26,7 +26,30 @@ export default class Views {
     this._data = data;
 
     // Get New stringHTML
-    const stringRecipe = this._generateHTml();
+    const NewStringRecipe = this._generateHTml();
+
+    const newDom = document
+      .createRange()
+      .createContextualFragment(NewStringRecipe); // Coverting string to DOM elememts
+    const newDomElements = Array.from(newDom.querySelectorAll('*'));
+    const curElements = Array.from(this._parentElement.querySelectorAll('*')); // Getting them as an array
+
+    newDomElements.forEach((newEl, index) => {
+      const curEl = curElements[index];
+
+      if (
+        !newEl.isEqualNode(curEl) &&
+        newEl.firstChild.nodeValue.trim() !== ''
+      ) {
+        curEl.textContent = newEl.textContent;
+      }
+
+      if (!newEl.isEqualNode(curEl)) {
+        Array.from(newEl.attributes).forEach(attr =>
+          curEl.setAttribute(attr.name, attr.value)
+        );
+      }
+    });
   }
 
   _clearParentEl() {

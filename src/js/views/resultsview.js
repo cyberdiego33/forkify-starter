@@ -12,9 +12,13 @@ const ResultsView = class extends Views {
   }
 
   _MarkupPreview(result) {
+    const hashId = window.location.hash.slice(1);
+
     return `
         <li class="preview">
-            <a class="preview__link preview__link--active" href="#${result.id}">
+            <a class="preview__link ${
+              hashId === result.id ? 'preview__link--active' : ''
+            }" href="#${result.id}">
               <figure class="preview__fig">
                 <img src="${result.imageUrl}" alt="Test" />
               </figure>
