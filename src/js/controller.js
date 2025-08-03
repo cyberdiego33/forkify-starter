@@ -32,13 +32,10 @@ const showRecipe = async function () {
     // Load recipe
     await model.loadRecipe(hashId);
 
-    // Getting the recipe from modelState
-    const RecipeObj = GetRecipeObj();
-    // console.log(RecipeObj);
-
     // Rendering the recipe
-    recipeview.render(RecipeObj);
+    recipeview.render(GetRecipeObj());
 
+    // Update active recipe
     resultsview.updateMarkup(model.getSearchResultPage());
   } catch (error) {
     console.error(`You have ${error}`);
@@ -85,11 +82,19 @@ const handleServings = function (newServings) {
   // Update the ModelState data
   model.loadServings(newServings);
 
-  // Update the recipeView ingredients
-  const RecipeObj = model.modelState.recipe;
-
   // recipeview.render(RecipeObj);
-  recipeview.updateMarkup(RecipeObj);
+  recipeview.updateMarkup(GetRecipeObj());
+};
+
+// BookMark Handler
+const handleBookmark = function () {
+  if (!GetRecipeObj().bookmarked) model.addBookMark(GetRecipeObj());
+  else model.removeBookMark(GetRecipeObj().id);
+
+  console.log(model.modelState.recipe);
+
+  // const RecipeObj = GetRecipeObj();
+  recipeview.updateMarkup(GetRecipeObj());
 };
 
 //////////////////////////////////////////
@@ -98,6 +103,7 @@ const handleServings = function (newServings) {
 const init = function () {
   recipeview.addhandlerEvent(showRecipe);
   recipeview.updateServing(handleServings);
+  recipeview.addBookMarks(handleBookmark);
   SearchView.addSearchListener(controlLoadSearch);
   paginationview.addPageHandler(controlPagination);
 };

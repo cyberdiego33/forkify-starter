@@ -698,11 +698,9 @@ const showRecipe = async function() {
         (0, _recipeviewJsDefault.default).spinner();
         // Load recipe
         await _modelsJs.loadRecipe(hashId);
-        // Getting the recipe from modelState
-        const RecipeObj = GetRecipeObj();
-        // console.log(RecipeObj);
         // Rendering the recipe
-        (0, _recipeviewJsDefault.default).render(RecipeObj);
+        (0, _recipeviewJsDefault.default).render(GetRecipeObj());
+        // Update active recipe
         (0, _resultsviewJsDefault.default).updateMarkup(_modelsJs.getSearchResultPage());
     } catch (error) {
         console.error(`You have ${error}`);
@@ -739,16 +737,23 @@ const controlPagination = function(goto) {
 const handleServings = function(newServings) {
     // Update the ModelState data
     _modelsJs.loadServings(newServings);
-    // Update the recipeView ingredients
-    const RecipeObj = _modelsJs.modelState.recipe;
     // recipeview.render(RecipeObj);
-    (0, _recipeviewJsDefault.default).updateMarkup(RecipeObj);
+    (0, _recipeviewJsDefault.default).updateMarkup(GetRecipeObj());
+};
+// BookMark Handler
+const handleBookmark = function() {
+    if (!GetRecipeObj().bookmarked) _modelsJs.addBookMark(GetRecipeObj());
+    else _modelsJs.removeBookMark(GetRecipeObj().id);
+    console.log(_modelsJs.modelState.recipe);
+    // const RecipeObj = GetRecipeObj();
+    (0, _recipeviewJsDefault.default).updateMarkup(GetRecipeObj());
 };
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
     (0, _recipeviewJsDefault.default).addhandlerEvent(showRecipe);
     (0, _recipeviewJsDefault.default).updateServing(handleServings);
+    (0, _recipeviewJsDefault.default).addBookMarks(handleBookmark);
     (0, _searchviewJsDefault.default).addSearchListener(controlLoadSearch);
     (0, _paginationviewJsDefault.default).addPageHandler(controlPagination);
 };
@@ -2630,6 +2635,8 @@ parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "LoadSearchResults", ()=>LoadSearchResults);
 parcelHelpers.export(exports, "getSearchResultPage", ()=>getSearchResultPage);
 parcelHelpers.export(exports, "loadServings", ()=>loadServings);
+parcelHelpers.export(exports, "addBookMark", ()=>addBookMark);
+parcelHelpers.export(exports, "removeBookMark", ()=>removeBookMark);
 var _configJs = require("./config.js");
 var _helpersJs = require("./helpers.js");
 const modelState = {
@@ -2639,7 +2646,8 @@ const modelState = {
         page: 1,
         results: [],
         resultPerPage: (0, _configJs.RES_PER_PAGE)
-    }
+    },
+    bookmarks: []
 };
 const loadRecipe = async function(id) {
     ////////////////////////////////////////
@@ -2658,6 +2666,8 @@ const loadRecipe = async function(id) {
             imageUrl: recipe.image_url,
             cookingTime: recipe.cooking_time
         };
+        if (modelState.bookmarks.some((bookmark)=>bookmark.id === modelState.recipe.id)) modelState.recipe.bookmarked = true;
+        else modelState.recipe.bookmarked = false;
     } catch (error) {
         throw error;
     }
@@ -2692,6 +2702,19 @@ const loadServings = function(newServings) {
         ing.quantity = ing.quantity * newServings / modelState.recipe.servings;
     });
     modelState.recipe.servings = newServings;
+};
+const addBookMark = function(bookrecipe) {
+    // console.log('recieved', bookrecipe);
+    // Adding a recipe to BookMarked
+    modelState.bookmarks.push(bookrecipe);
+    // Checking for bookmark
+    if (bookrecipe.id === modelState.recipe.id) modelState.recipe.bookmarked = true;
+};
+const removeBookMark = function(id) {
+    const index = modelState.bookmarks.findIndex((el)=>el.id === id);
+    modelState.bookmarks.slice(index, 1);
+    // Checking for bookmark
+    if (modelState.recipe.id === id) modelState.recipe.bookmarked = false;
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./config.js":"2hPh4","./helpers.js":"7nL9P"}],"2hPh4":[function(require,module,exports,__globalThis) {
@@ -2771,12 +2794,19 @@ const RecipeView = class extends (0, _viewsDefault.default) {
     }
     updateServing(handler) {
         this._parentElement.addEventListener('click', (e)=>{
-            const btn = e.target.closest('.btn--update-servings');
-            if (!btn) return;
+            const btnServings = e.target.closest('.btn--update-servings');
+            if (!btnServings) return;
             // console.log('Servings clicked');
-            const updateto = +btn.dataset.updateto;
+            const updateto = +btnServings.dataset.updateto;
             // console.log('update to', updateto);
             if (updateto > 0) handler(updateto);
+        });
+    }
+    addBookMarks(handler) {
+        this._parentElement.addEventListener('click', (e)=>{
+            const btnBookmark = e.target.closest('.btn-bookmarked');
+            if (!btnBookmark) return;
+            handler();
         });
     }
     _generateHTml() {
@@ -2823,9 +2853,9 @@ const RecipeView = class extends (0, _viewsDefault.default) {
               <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
             </svg>
           </div>
-          <button class="btn--round">
+          <button class="btn--round btn-bookmarked">
             <svg class="">
-              <use href="${0, _iconsSvgDefault.default}#icon-bookmark-fill"></use>
+              <use href="${0, _iconsSvgDefault.default}#icon-bookmark${this._data.bookmarked ? '-fill' : ''}"></use>
             </svg>
           </button>
         </div>
@@ -2908,7 +2938,7 @@ class Views {
         const curElements = Array.from(this._parentElement.querySelectorAll('*')); // Getting them as an array
         newDomElements.forEach((newEl, index)=>{
             const curEl = curElements[index];
-            if (!newEl.isEqualNode(curEl) && newEl.firstChild.nodeValue.trim() !== '') curEl.textContent = newEl.textContent;
+            if (!newEl.isEqualNode(curEl) && newEl.firstChild?.nodeValue.trim() !== '') curEl.textContent = newEl.textContent;
             if (!newEl.isEqualNode(curEl)) Array.from(newEl.attributes).forEach((attr)=>curEl.setAttribute(attr.name, attr.value));
         });
     }

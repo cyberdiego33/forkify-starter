@@ -9,8 +9,10 @@ export const modelState = {
     results: [],
     resultPerPage: RES_PER_PAGE,
   },
+  bookmarks: [],
 };
 
+// When a search result is clicked
 export const loadRecipe = async function (id) {
   ////////////////////////////////////////
   // Fetching a recipe
@@ -30,11 +32,22 @@ export const loadRecipe = async function (id) {
       imageUrl: recipe.image_url,
       cookingTime: recipe.cooking_time,
     };
+
+    if (
+      modelState.bookmarks.some(
+        bookmark => bookmark.id === modelState.recipe.id
+      )
+    )
+      modelState.recipe.bookmarked = true;
+    else {
+      modelState.recipe.bookmarked = false;
+    }
   } catch (error) {
     throw error;
   }
 };
 
+// For Search results
 export const LoadSearchResults = async function (query) {
   try {
     modelState.searchs.query = query;
@@ -56,6 +69,7 @@ export const LoadSearchResults = async function (query) {
   }
 };
 
+// For pagination
 export const getSearchResultPage = function (page = modelState.searchs.page) {
   modelState.searchs.page = page;
 
@@ -65,6 +79,7 @@ export const getSearchResultPage = function (page = modelState.searchs.page) {
   return modelState.searchs.results.slice(start, end);
 };
 
+// For increasing/decreasing servings
 export const loadServings = function (newServings) {
   modelState.recipe.ingredients.forEach(ing => {
     // formula = Old quantity * newServings / old Servings
@@ -72,4 +87,23 @@ export const loadServings = function (newServings) {
   });
 
   modelState.recipe.servings = newServings;
+};
+
+export const addBookMark = function (bookrecipe) {
+  // console.log('recieved', bookrecipe);
+
+  // Adding a recipe to BookMarked
+  modelState.bookmarks.push(bookrecipe);
+
+  // Checking for bookmark
+  if (bookrecipe.id === modelState.recipe.id)
+    modelState.recipe.bookmarked = true;
+};
+
+export const removeBookMark = function (id) {
+  const index = modelState.bookmarks.findIndex(el => el.id === id);
+  modelState.bookmarks.slice(index, 1);
+
+  // Checking for bookmark
+  if (modelState.recipe.id === id) modelState.recipe.bookmarked = false;
 };

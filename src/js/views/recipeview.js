@@ -39,14 +39,22 @@ const RecipeView = class extends Views {
 
   updateServing(handler) {
     this._parentElement.addEventListener('click', e => {
-      const btn = e.target.closest('.btn--update-servings');
-      if (!btn) return;
+      const btnServings = e.target.closest('.btn--update-servings');
+      if (!btnServings) return;
 
       // console.log('Servings clicked');
 
-      const updateto = +btn.dataset.updateto;
+      const updateto = +btnServings.dataset.updateto;
       // console.log('update to', updateto);
       if (updateto > 0) handler(updateto);
+    });
+  }
+
+  addBookMarks(handler) {
+    this._parentElement.addEventListener('click', e => {
+      const btnBookmark = e.target.closest('.btn-bookmarked');
+      if (!btnBookmark) return;
+      handler();
     });
   }
 
@@ -102,9 +110,11 @@ const RecipeView = class extends Views {
               <use href="${icon}#icon-user"></use>
             </svg>
           </div>
-          <button class="btn--round">
+          <button class="btn--round btn-bookmarked">
             <svg class="">
-              <use href="${icon}#icon-bookmark-fill"></use>
+              <use href="${icon}#icon-bookmark${
+      this._data.bookmarked ? '-fill' : ''
+    }"></use>
             </svg>
           </button>
         </div>
