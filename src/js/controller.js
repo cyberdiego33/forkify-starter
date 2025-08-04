@@ -9,6 +9,7 @@ import SearchView from './views/searchview.js';
 import resultsview from './views/resultsview.js';
 import bookmarkedview from './views/bookmarkedview.js';
 import paginationview from './views/paginationview.js';
+import addrecipeview from './views/addrecipeview.js';
 
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
@@ -109,6 +110,10 @@ const loadBookMarks = function () {
   bookmarkedview.render(model.modelState.bookmarks);
 };
 
+const getNewRecipe = function (newData) {
+  console.log(newData);
+};
+
 //////////////////////////////////////////
 // Initializing the app
 
@@ -119,6 +124,7 @@ const init = function () {
   recipeview.addBookMarks(handleBookmark);
   SearchView.addSearchListener(controlLoadSearch);
   paginationview.addPageHandler(controlPagination);
+  addrecipeview.handleSubmit(getNewRecipe);
 };
 
 init();
