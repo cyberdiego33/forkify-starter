@@ -704,6 +704,7 @@ const showRecipe = async function() {
         (0, _recipeviewJsDefault.default).render(GetRecipeObj());
         // Update active recipe
         (0, _resultsviewJsDefault.default).updateMarkup(_modelsJs.getSearchResultPage());
+        // Updating bookmarks view
         (0, _bookmarkedviewJsDefault.default).updateMarkup(_modelsJs.modelState.bookmarks);
     } catch (error) {
         console.error(`You have ${error}`);
@@ -754,9 +755,13 @@ const handleBookmark = function() {
     // Render into bookmark UI
     (0, _bookmarkedviewJsDefault.default).render(_modelsJs.modelState.bookmarks);
 };
+const loadBookMarks = function() {
+    (0, _bookmarkedviewJsDefault.default).render(_modelsJs.modelState.bookmarks);
+};
 //////////////////////////////////////////
 // Initializing the app
 const init = function() {
+    (0, _bookmarkedviewJsDefault.default).addBookMarksHandler(loadBookMarks);
     (0, _recipeviewJsDefault.default).addhandlerEvent(showRecipe);
     (0, _recipeviewJsDefault.default).updateServing(handleServings);
     (0, _recipeviewJsDefault.default).addBookMarks(handleBookmark);
@@ -765,7 +770,7 @@ const init = function() {
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/paginationview.js":"eayKT","./views/bookmarkedview.js":"cdxGc"}],"jnFvT":[function(require,module,exports,__globalThis) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/bookmarkedview.js":"cdxGc","./views/paginationview.js":"eayKT"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -2709,19 +2714,29 @@ const loadServings = function(newServings) {
     });
     modelState.recipe.servings = newServings;
 };
+const addLocalStorage = function() {
+    localStorage.setItem('bookmarks', JSON.stringify(modelState.bookmarks));
+};
 const addBookMark = function(bookrecipe) {
     // console.log('recieved', bookrecipe);
     // Adding a recipe to BookMarked
     modelState.bookmarks.push(bookrecipe);
     // Checking for bookmark
     if (bookrecipe.id === modelState.recipe.id) modelState.recipe.bookmarked = true;
+    addLocalStorage();
 };
 const removeBookMark = function(id) {
     const index = modelState.bookmarks.findIndex((el)=>el.id === id);
-    modelState.bookmarks.slice(index, 1);
+    modelState.bookmarks.splice(index, 1);
     // Checking for bookmark
     if (modelState.recipe.id === id) modelState.recipe.bookmarked = false;
+    addLocalStorage();
 };
+const getLocalBookmarks = function() {
+    const storage = localStorage.getItem('bookmarks');
+    if (storage) modelState.bookmarks = JSON.parse(storage);
+};
+getLocalBookmarks();
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./config.js":"2hPh4","./helpers.js":"7nL9P"}],"2hPh4":[function(require,module,exports,__globalThis) {
 // export const API_URL = 'https://forkify-api.jonas.io/api/v2/recipes'
@@ -2922,11 +2937,12 @@ var _iconsSvg = require("url:../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class Views {
     _data;
-    render(data) {
+    render(data, render = true) {
         if (!data || Array.isArray(data) && data.length === 0) return this.RenderErrorMes();
         this._data = data;
         // Get stringHTML
         const stringRecipe = this._generateHTml();
+        if (!render) return stringRecipe;
         /////////////////////////////////////////////
         // Inserting the stringRecipe
         this._clearParentEl();
@@ -3020,8 +3036,8 @@ exports.default = new SearchView();
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"hncNs":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _iconsSvg = require("url:../../img/icons.svg");
-var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _previewview = require("./previewview");
+var _previewviewDefault = parcelHelpers.interopDefault(_previewview);
 var _views = require("./views");
 var _viewsDefault = parcelHelpers.interopDefault(_views);
 const ResultsView = class extends (0, _viewsDefault.default) {
@@ -3030,19 +3046,31 @@ const ResultsView = class extends (0, _viewsDefault.default) {
     message;
     _generateHTml() {
         // console.log(this._data);
-        return this._data.map((data)=>this._MarkupPreview(data)).join('');
+        return this._data.map((result)=>(0, _previewviewDefault.default).render(result, false)).join('');
     }
-    _MarkupPreview(result) {
+};
+exports.default = new ResultsView();
+
+},{"./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","./previewview":"fD8dS"}],"fD8dS":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _iconsSvg = require("url:../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _views = require("./views");
+var _viewsDefault = parcelHelpers.interopDefault(_views);
+const PreviewView = class extends (0, _viewsDefault.default) {
+    _parentElement = '';
+    _generateHTml() {
         const hashId = window.location.hash.slice(1);
         return `
         <li class="preview">
-            <a class="preview__link ${hashId === result.id ? 'preview__link--active' : ''}" href="#${result.id}">
+            <a class="preview__link ${hashId === this._data.id ? 'preview__link--active' : ''}" href="#${this._data.id}">
               <figure class="preview__fig">
-                <img src="${result.imageUrl}" alt="Test" />
+                <img src="${this._data.imageUrl}" alt="Test" />
               </figure>
               <div class="preview__data">
-                <h4 class="preview__title">${result.title}</h4>
-                <p class="preview__publisher">${result.publisher}</p>
+                <h4 class="preview__title">${this._data.title}</h4>
+                <p class="preview__publisher">${this._data.publisher}</p>
                 <div class="preview__user-generated">
                   <svg>
                     <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
@@ -3054,9 +3082,30 @@ const ResultsView = class extends (0, _viewsDefault.default) {
     `;
     }
 };
-exports.default = new ResultsView();
+exports.default = new PreviewView();
 
-},{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eayKT":[function(require,module,exports,__globalThis) {
+},{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"cdxGc":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _previewview = require("./previewview");
+var _previewviewDefault = parcelHelpers.interopDefault(_previewview);
+var _views = require("./views");
+var _viewsDefault = parcelHelpers.interopDefault(_views);
+const BookMarkView = class extends (0, _viewsDefault.default) {
+    _parentElement = document.querySelector('.bookmarks__list');
+    _errorMessage = 'No bookmarks yet. Find a nice recipe and bookmark it :)';
+    message;
+    addBookMarksHandler(handler) {
+        window.addEventListener('load', handler);
+    }
+    _generateHTml() {
+        // console.log(this._data);
+        return this._data.map((bookmark)=>(0, _previewviewDefault.default).render(bookmark, false)).join('');
+    }
+};
+exports.default = new BookMarkView();
+
+},{"./previewview":"fD8dS","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"eayKT":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("url:../../img/icons.svg");
@@ -3121,45 +3170,6 @@ const PaginationView = class extends (0, _viewsDefault.default) {
     }
 };
 exports.default = new PaginationView();
-
-},{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"cdxGc":[function(require,module,exports,__globalThis) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _iconsSvg = require("url:../../img/icons.svg");
-var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
-var _views = require("./views");
-var _viewsDefault = parcelHelpers.interopDefault(_views);
-const BookMarkView = class extends (0, _viewsDefault.default) {
-    _parentElement = document.querySelector('.bookmarks__list');
-    _errorMessage = 'No bookmarks yet. Find a nice recipe and bookmark it :)';
-    message;
-    _generateHTml() {
-        // console.log(this._data);
-        return this._data.map((data)=>this._MarkupPreview(data)).join('');
-    }
-    _MarkupPreview(result) {
-        const hashId = window.location.hash.slice(1);
-        return `
-        <li class="preview">
-            <a class="preview__link ${hashId === result.id ? 'preview__link--active' : ''}" href="#${result.id}">
-              <figure class="preview__fig">
-                <img src="${result.imageUrl}" alt="Test" />
-              </figure>
-              <div class="preview__data">
-                <h4 class="preview__title">${result.title}</h4>
-                <p class="preview__publisher">${result.publisher}</p>
-                <div class="preview__user-generated">
-                  <svg>
-                    <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
-                  </svg>
-                </div>
-              </div>
-            </a>
-          </li>
-    `;
-    }
-};
-exports.default = new BookMarkView();
 
 },{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["5DuvQ","7dWZ8"], "7dWZ8", "parcelRequired893", {}, "./", "/")
 

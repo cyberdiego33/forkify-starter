@@ -3,7 +3,7 @@ import icon from 'url:../../img/icons.svg';
 export default class Views {
   _data;
 
-  render(data) {
+  render(data, render = true) {
     if (!data || (Array.isArray(data) && data.length === 0))
       return this.RenderErrorMes();
 
@@ -11,6 +11,8 @@ export default class Views {
 
     // Get stringHTML
     const stringRecipe = this._generateHTml();
+
+    if (!render) return stringRecipe;
 
     /////////////////////////////////////////////
     // Inserting the stringRecipe

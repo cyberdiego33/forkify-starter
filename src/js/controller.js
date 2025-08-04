@@ -38,6 +38,8 @@ const showRecipe = async function () {
 
     // Update active recipe
     resultsview.updateMarkup(model.getSearchResultPage());
+
+    // Updating bookmarks view
     bookmarkedview.updateMarkup(model.modelState.bookmarks);
   } catch (error) {
     console.error(`You have ${error}`);
@@ -103,10 +105,15 @@ const handleBookmark = function () {
   bookmarkedview.render(model.modelState.bookmarks);
 };
 
+const loadBookMarks = function () {
+  bookmarkedview.render(model.modelState.bookmarks);
+};
+
 //////////////////////////////////////////
 // Initializing the app
 
 const init = function () {
+  bookmarkedview.addBookMarksHandler(loadBookMarks);
   recipeview.addhandlerEvent(showRecipe);
   recipeview.updateServing(handleServings);
   recipeview.addBookMarks(handleBookmark);
