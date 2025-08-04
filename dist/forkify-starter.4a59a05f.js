@@ -679,6 +679,8 @@ var _searchviewJs = require("./views/searchview.js");
 var _searchviewJsDefault = parcelHelpers.interopDefault(_searchviewJs);
 var _resultsviewJs = require("./views/resultsview.js");
 var _resultsviewJsDefault = parcelHelpers.interopDefault(_resultsviewJs);
+var _bookmarkedviewJs = require("./views/bookmarkedview.js");
+var _bookmarkedviewJsDefault = parcelHelpers.interopDefault(_bookmarkedviewJs);
 var _paginationviewJs = require("./views/paginationview.js");
 var _paginationviewJsDefault = parcelHelpers.interopDefault(_paginationviewJs);
 // NEW API URL (instead of the one shown in the video)
@@ -702,6 +704,7 @@ const showRecipe = async function() {
         (0, _recipeviewJsDefault.default).render(GetRecipeObj());
         // Update active recipe
         (0, _resultsviewJsDefault.default).updateMarkup(_modelsJs.getSearchResultPage());
+        (0, _bookmarkedviewJsDefault.default).updateMarkup(_modelsJs.modelState.bookmarks);
     } catch (error) {
         console.error(`You have ${error}`);
         (0, _recipeviewJsDefault.default).RenderErrorMes();
@@ -742,11 +745,14 @@ const handleServings = function(newServings) {
 };
 // BookMark Handler
 const handleBookmark = function() {
+    // Add/Remove Bookmark
     if (!GetRecipeObj().bookmarked) _modelsJs.addBookMark(GetRecipeObj());
     else _modelsJs.removeBookMark(GetRecipeObj().id);
-    console.log(_modelsJs.modelState.recipe);
-    // const RecipeObj = GetRecipeObj();
+    // console.log(model.modelState.recipe);
+    // Update the View
     (0, _recipeviewJsDefault.default).updateMarkup(GetRecipeObj());
+    // Render into bookmark UI
+    (0, _bookmarkedviewJsDefault.default).render(_modelsJs.modelState.bookmarks);
 };
 //////////////////////////////////////////
 // Initializing the app
@@ -759,7 +765,7 @@ const init = function() {
 };
 init();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/paginationview.js":"eayKT"}],"jnFvT":[function(require,module,exports,__globalThis) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT","core-js/modules/web.immediate.js":"bzsBv","regenerator-runtime/runtime":"f6ot0","./models.js":"3JKkD","./views/recipeview.js":"6kxfp","./views/searchview.js":"3up1j","./views/resultsview.js":"hncNs","./views/paginationview.js":"eayKT","./views/bookmarkedview.js":"cdxGc"}],"jnFvT":[function(require,module,exports,__globalThis) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -3115,6 +3121,45 @@ const PaginationView = class extends (0, _viewsDefault.default) {
     }
 };
 exports.default = new PaginationView();
+
+},{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"cdxGc":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _iconsSvg = require("url:../../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+var _views = require("./views");
+var _viewsDefault = parcelHelpers.interopDefault(_views);
+const BookMarkView = class extends (0, _viewsDefault.default) {
+    _parentElement = document.querySelector('.bookmarks__list');
+    _errorMessage = 'No bookmarks yet. Find a nice recipe and bookmark it :)';
+    message;
+    _generateHTml() {
+        // console.log(this._data);
+        return this._data.map((data)=>this._MarkupPreview(data)).join('');
+    }
+    _MarkupPreview(result) {
+        const hashId = window.location.hash.slice(1);
+        return `
+        <li class="preview">
+            <a class="preview__link ${hashId === result.id ? 'preview__link--active' : ''}" href="#${result.id}">
+              <figure class="preview__fig">
+                <img src="${result.imageUrl}" alt="Test" />
+              </figure>
+              <div class="preview__data">
+                <h4 class="preview__title">${result.title}</h4>
+                <p class="preview__publisher">${result.publisher}</p>
+                <div class="preview__user-generated">
+                  <svg>
+                    <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
+                  </svg>
+                </div>
+              </div>
+            </a>
+          </li>
+    `;
+    }
+};
+exports.default = new BookMarkView();
 
 },{"url:../../img/icons.svg":"fd0vu","./views":"h3Eg6","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}]},["5DuvQ","7dWZ8"], "7dWZ8", "parcelRequired893", {}, "./", "/")
 

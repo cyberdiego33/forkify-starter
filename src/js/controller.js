@@ -7,6 +7,7 @@ import * as model from './models.js';
 import recipeview from './views/recipeview.js';
 import SearchView from './views/searchview.js';
 import resultsview from './views/resultsview.js';
+import bookmarkedview from './views/bookmarkedview.js';
 import paginationview from './views/paginationview.js';
 
 // NEW API URL (instead of the one shown in the video)
@@ -37,6 +38,7 @@ const showRecipe = async function () {
 
     // Update active recipe
     resultsview.updateMarkup(model.getSearchResultPage());
+    bookmarkedview.updateMarkup(model.modelState.bookmarks);
   } catch (error) {
     console.error(`You have ${error}`);
     recipeview.RenderErrorMes();
@@ -88,13 +90,17 @@ const handleServings = function (newServings) {
 
 // BookMark Handler
 const handleBookmark = function () {
+  // Add/Remove Bookmark
   if (!GetRecipeObj().bookmarked) model.addBookMark(GetRecipeObj());
   else model.removeBookMark(GetRecipeObj().id);
 
-  console.log(model.modelState.recipe);
+  // console.log(model.modelState.recipe);
 
-  // const RecipeObj = GetRecipeObj();
+  // Update the View
   recipeview.updateMarkup(GetRecipeObj());
+
+  // Render into bookmark UI
+  bookmarkedview.render(model.modelState.bookmarks);
 };
 
 //////////////////////////////////////////
