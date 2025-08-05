@@ -10,6 +10,7 @@ import resultsview from './views/resultsview.js';
 import bookmarkedview from './views/bookmarkedview.js';
 import paginationview from './views/paginationview.js';
 import addrecipeview from './views/addrecipeview.js';
+import { FORM_CLOSE_SEC } from './config.js';
 
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
@@ -110,8 +111,28 @@ const loadBookMarks = function () {
   bookmarkedview.render(model.modelState.bookmarks);
 };
 
-const getNewRecipe = function (newData) {
-  console.log(newData);
+const getNewRecipe = async function (newData) {
+  try {
+    // Render Spinner
+    addrecipeview.spinner();
+
+    // Upload Recipes to API
+    await model.uploadRecipe(newData);
+
+    // Render new recipe to view
+    recipeview.render(GetRecipeObj());
+
+    // Display success message
+    addrecipeview.showSuccess();
+
+    // Close the Form overlay
+    setTimeout(() => {
+      addrecipeview.toggleOverlay();
+    }, FORM_CLOSE_SEC * 1000);
+  } catch (error) {
+    console.error('🤡', error);
+    addrecipeview.RenderErrorMes(error);
+  }
 };
 
 //////////////////////////////////////////

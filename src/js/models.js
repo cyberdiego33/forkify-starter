@@ -1,5 +1,5 @@
-import { API_URL, RES_PER_PAGE } from './config.js';
-import { getJson } from './helpers.js';
+import { API_URL, APIKEY, RES_PER_PAGE } from './config.js';
+import { getJson, sendJson } from './helpers.js';
 
 export const modelState = {
   recipe: {},
@@ -12,6 +12,20 @@ export const modelState = {
   bookmarks: [],
 };
 
+const createRecipeObj = function (recipe) {
+  return {
+    id: recipe.id,
+    title: recipe.title,
+    publisher: recipe.publisher,
+    servings: recipe.servings,
+    ingredients: recipe.ingredients,
+    sourceUrl: recipe.source_url,
+    imageUrl: recipe.image_url,
+    cookingTime: recipe.cooking_time,
+    ...(recipe.key && { key: recipe.key }),
+  };
+};
+
 // When a search result is clicked
 export const loadRecipe = async function (id) {
   ////////////////////////////////////////
@@ -22,16 +36,7 @@ export const loadRecipe = async function (id) {
     const { recipe } = data.data;
 
     // Updating the modelState
-    modelState.recipe = {
-      id: recipe.id,
-      title: recipe.title,
-      publisher: recipe.publisher,
-      servings: recipe.servings,
-      ingredients: recipe.ingredients,
-      sourceUrl: recipe.source_url,
-      imageUrl: recipe.image_url,
-      cookingTime: recipe.cooking_time,
-    };
+    modelState.recipe = createRecipeObj(recipe);
 
     if (
       modelState.bookmarks.some(
@@ -89,13 +94,14 @@ export const loadServings = function (newServings) {
   modelState.recipe.servings = newServings;
 };
 
+////////////////////////////////////////////////
+// Bookmark section
+
 const addLocalStorage = function () {
   localStorage.setItem('bookmarks', JSON.stringify(modelState.bookmarks));
 };
 
 export const addBookMark = function (bookrecipe) {
-  // console.log('recieved', bookrecipe);
-
   // Adding a recipe to BookMarked
   modelState.bookmarks.push(bookrecipe);
 
@@ -116,9 +122,54 @@ export const removeBookMark = function (id) {
   addLocalStorage();
 };
 
+const clearLocalStorage = function () {
+  localStorage.clear('bookmarks');
+};
+
 const getLocalBookmarks = function () {
   const storage = localStorage.getItem('bookmarks');
   if (storage) modelState.bookmarks = JSON.parse(storage);
 };
 
 getLocalBookmarks();
+
+export const uploadRecipe = async function (newRecipe) {
+  try {
+    const recipeIngredients = Object.entries(newRecipe)
+      .filter(entry => entry[0].startsWith('ingredient') && entry[1] !== '')
+      .map(ing => {
+        const ingArr = ing[1].replaceAll(' ', '').split(',');
+
+        if (ingArr.length !== 3)
+          throw new Error(
+            'Wrong ingredient format! Expected 3 input with comma(,) seperated'
+          );
+
+        const [quantity, unit, description] = ingArr;
+
+        return { quantity: quantity ? +quantity : null, unit, description };
+      });
+
+    const sendrecipe = {
+      title: newRecipe.title,
+      source_url: newRecipe.sourceUrl,
+      image_url: newRecipe.image,
+      publisher: newRecipe.publisher,
+      cooking_time: +newRecipe.cookingTime,
+      servings: +newRecipe.servings,
+      ingredients: recipeIngredients,
+    };
+
+    const response = await sendJson(`${API_URL}?key=${APIKEY}`, sendrecipe);
+    const { recipe: createdRecipe } = response.data;
+
+    modelState.recipe = createRecipeObj(createdRecipe);
+    addBookMark(modelState.recipe);
+
+    console.log(modelState.recipe);
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 8f621e6c-17a3-41d0-8f08-2f4113481e22
