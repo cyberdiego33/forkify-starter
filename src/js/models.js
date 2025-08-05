@@ -1,5 +1,5 @@
 import { API_URL, APIKEY, RES_PER_PAGE } from './config.js';
-import { getJson, sendJson } from './helpers.js';
+import { AJAX } from './helpers.js';
 
 export const modelState = {
   recipe: {},
@@ -31,7 +31,7 @@ export const loadRecipe = async function (id) {
   ////////////////////////////////////////
   // Fetching a recipe
   try {
-    const data = await getJson(`${API_URL}/${id}`);
+    const data = await AJAX(`${API_URL}/${id}`);
 
     const { recipe } = data.data;
 
@@ -58,7 +58,7 @@ export const LoadSearchResults = async function (query) {
     modelState.searchs.query = query;
 
     // https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza
-    const { data } = await getJson(`${API_URL}?search=${query}`);
+    const { data } = await AJAX(`${API_URL}?search=${query}`);
     const { recipes } = data;
 
     modelState.searchs.results = recipes.map(rec => {
@@ -160,7 +160,7 @@ export const uploadRecipe = async function (newRecipe) {
       ingredients: recipeIngredients,
     };
 
-    const response = await sendJson(`${API_URL}?key=${APIKEY}`, sendrecipe);
+    const response = await AJAX(`${API_URL}?key=${APIKEY}`, sendrecipe);
     const { recipe: createdRecipe } = response.data;
 
     modelState.recipe = createRecipeObj(createdRecipe);

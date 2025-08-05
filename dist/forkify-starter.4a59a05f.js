@@ -771,6 +771,10 @@ const getNewRecipe = async function(newData) {
         (0, _recipeviewJsDefault.default).render(GetRecipeObj());
         // Display success message
         (0, _addrecipeviewJsDefault.default).showSuccess();
+        // Render new bookmark
+        (0, _bookmarkedviewJsDefault.default).render(_modelsJs.modelState.bookmarks);
+        // Change the URL
+        window.history.pushState(null, '', `#${GetRecipeObj().id}`);
         // Close the Form overlay
         setTimeout(()=>{
             (0, _addrecipeviewJsDefault.default).toggleOverlay();
@@ -2703,7 +2707,7 @@ const loadRecipe = async function(id) {
     ////////////////////////////////////////
     // Fetching a recipe
     try {
-        const data = await (0, _helpersJs.getJson)(`${(0, _configJs.API_URL)}/${id}`);
+        const data = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}/${id}`);
         const { recipe } = data.data;
         // Updating the modelState
         modelState.recipe = createRecipeObj(recipe);
@@ -2717,7 +2721,7 @@ const LoadSearchResults = async function(query) {
     try {
         modelState.searchs.query = query;
         // https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza
-        const { data } = await (0, _helpersJs.getJson)(`${(0, _configJs.API_URL)}?search=${query}`);
+        const { data } = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}?search=${query}`);
         const { recipes } = data;
         modelState.searchs.results = recipes.map((rec)=>{
             return {
@@ -2792,7 +2796,7 @@ const uploadRecipe = async function(newRecipe) {
             servings: +newRecipe.servings,
             ingredients: recipeIngredients
         };
-        const response = await (0, _helpersJs.sendJson)(`${(0, _configJs.API_URL)}?key=${(0, _configJs.APIKEY)}`, sendrecipe);
+        const response = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}?key=${(0, _configJs.APIKEY)}`, sendrecipe);
         const { recipe: createdRecipe } = response.data;
         modelState.recipe = createRecipeObj(createdRecipe);
         addBookMark(modelState.recipe);
@@ -2821,8 +2825,7 @@ const FORM_CLOSE_SEC = 2.5;
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"7nL9P":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getJson", ()=>getJson);
-parcelHelpers.export(exports, "sendJson", ()=>sendJson);
+parcelHelpers.export(exports, "AJAX", ()=>AJAX);
 var _configJs = require("./config.js");
 const timeout = function(s) {
     return new Promise(function(_, reject) {
@@ -2831,29 +2834,15 @@ const timeout = function(s) {
         }, s * 1000);
     });
 };
-const getJson = async function(url) {
+const AJAX = async function(url, uploadData) {
     try {
-        const response = await Promise.race([
-            fetch(url),
-            timeout((0, _configJs.TIMEOUT_SEC))
-        ]);
-        const data = await response.json();
-        // Catching and throwing errors
-        if (!response.ok) throw new Error(`${data.message} (${response.status})`);
-        return data;
-    } catch (error) {
-        throw error;
-    }
-};
-const sendJson = async function(url, uploadData) {
-    try {
-        const fetchpro = await fetch(url, {
+        const fetchpro = uploadData ? fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(uploadData)
-        });
+        }) : fetch(url);
         const response = await Promise.race([
             fetchpro,
             timeout((0, _configJs.TIMEOUT_SEC))

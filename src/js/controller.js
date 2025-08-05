@@ -125,6 +125,12 @@ const getNewRecipe = async function (newData) {
     // Display success message
     addrecipeview.showSuccess();
 
+    // Render new bookmark
+    bookmarkedview.render(model.modelState.bookmarks);
+
+    // Change the URL
+    window.history.pushState(null, '', `#${GetRecipeObj().id}`);
+
     // Close the Form overlay
     setTimeout(() => {
       addrecipeview.toggleOverlay();
