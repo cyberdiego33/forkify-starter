@@ -2707,7 +2707,7 @@ const loadRecipe = async function(id) {
     ////////////////////////////////////////
     // Fetching a recipe
     try {
-        const data = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}/${id}`);
+        const data = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}/${id}?key=${(0, _configJs.APIKEY)}`);
         const { recipe } = data.data;
         // Updating the modelState
         modelState.recipe = createRecipeObj(recipe);
@@ -2721,14 +2721,17 @@ const LoadSearchResults = async function(query) {
     try {
         modelState.searchs.query = query;
         // https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza
-        const { data } = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}?search=${query}`);
+        const { data } = await (0, _helpersJs.AJAX)(`${(0, _configJs.API_URL)}?search=${query}&key=${(0, _configJs.APIKEY)}`);
         const { recipes } = data;
         modelState.searchs.results = recipes.map((rec)=>{
             return {
                 id: rec.id,
                 publisher: rec.publisher,
                 title: rec.title,
-                imageUrl: rec.image_url
+                imageUrl: rec.image_url,
+                ...rec.key && {
+                    key: rec.key
+                }
             };
         });
     } catch (error) {
@@ -2778,7 +2781,7 @@ getLocalBookmarks();
 const uploadRecipe = async function(newRecipe) {
     try {
         const recipeIngredients = Object.entries(newRecipe).filter((entry)=>entry[0].startsWith('ingredient') && entry[1] !== '').map((ing)=>{
-            const ingArr = ing[1].replaceAll(' ', '').split(',');
+            const ingArr = ing[1].split(',').map((el)=>el.trim());
             if (ingArr.length !== 3) throw new Error('Wrong ingredient format! Expected 3 input with comma(,) seperated');
             const [quantity, unit, description] = ingArr;
             return {
@@ -2948,7 +2951,7 @@ const RecipeView = class extends (0, _viewsDefault.default) {
             </div>
           </div>
 
-          <div class="recipe__user-generated">
+          <div class="recipe__user-generated ${this._data.key ? '' : 'hidden'}">
             <svg>
               <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
             </svg>
@@ -3150,7 +3153,7 @@ const PreviewView = class extends (0, _viewsDefault.default) {
               <div class="preview__data">
                 <h4 class="preview__title">${this._data.title}</h4>
                 <p class="preview__publisher">${this._data.publisher}</p>
-                <div class="preview__user-generated">
+                <div class="preview__user-generated ${this._data.key ? '' : 'hidden'}">
                   <svg>
                     <use href="${0, _iconsSvgDefault.default}#icon-user"></use>
                   </svg>

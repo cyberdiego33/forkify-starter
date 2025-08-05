@@ -31,7 +31,7 @@ export const loadRecipe = async function (id) {
   ////////////////////////////////////////
   // Fetching a recipe
   try {
-    const data = await AJAX(`${API_URL}/${id}`);
+    const data = await AJAX(`${API_URL}/${id}?key=${APIKEY}`);
 
     const { recipe } = data.data;
 
@@ -58,7 +58,7 @@ export const LoadSearchResults = async function (query) {
     modelState.searchs.query = query;
 
     // https://forkify-api.herokuapp.com/api/v2/recipes?search=pizza
-    const { data } = await AJAX(`${API_URL}?search=${query}`);
+    const { data } = await AJAX(`${API_URL}?search=${query}&key=${APIKEY}`);
     const { recipes } = data;
 
     modelState.searchs.results = recipes.map(rec => {
@@ -67,6 +67,7 @@ export const LoadSearchResults = async function (query) {
         publisher: rec.publisher,
         title: rec.title,
         imageUrl: rec.image_url,
+        ...(rec.key && { key: rec.key }),
       };
     });
   } catch (error) {
@@ -138,7 +139,7 @@ export const uploadRecipe = async function (newRecipe) {
     const recipeIngredients = Object.entries(newRecipe)
       .filter(entry => entry[0].startsWith('ingredient') && entry[1] !== '')
       .map(ing => {
-        const ingArr = ing[1].replaceAll(' ', '').split(',');
+        const ingArr = ing[1].split(',').map(el => el.trim());
 
         if (ingArr.length !== 3)
           throw new Error(
