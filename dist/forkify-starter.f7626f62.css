@@ -489,11 +489,14 @@ body {
   flex-direction: column;
   padding: 3rem 0;
   display: flex;
+  position: relative;
 }
 
 .results {
+  max-height: max(600px, 70%);
   margin-bottom: 2rem;
   list-style: none;
+  overflow-y: auto;
 }
 
 .pagination {
